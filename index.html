@@ -15,7 +15,6 @@
 <body class="min-h-screen py-10 px-4">
 
     <div class="max-w-xl mx-auto">
-        <!-- 訂購表單區 -->
         <div id="form-container" class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/20">
             <div class="gold-gradient p-8 text-white text-center">
                 <h1 class="text-3xl font-bold tracking-[0.2em]">搭伙晚餐</h1>
@@ -26,7 +25,6 @@
             </div>
 
             <form id="orderForm" class="p-6 space-y-8">
-                <!-- 基本資料區 -->
                 <div class="bg-gray-50 rounded-2xl p-6 space-y-6 border border-gray-100">
                     <h2 class="text-base font-black text-[#a67c52] tracking-widest border-l-4 border-[#a67c52] pl-3">基本聯絡資料</h2>
                     <div>
@@ -53,7 +51,7 @@
                     </div>
                     <div id="addressSection" class="hidden">
                         <label class="block text-sm font-black text-gray-700 mb-2">配送地址</label>
-                        <input type="text" id="userAddress" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-[#a67c52]" placeholder="請輸入外送地址 (限3公里內)">
+                        <input type="text" id="userAddress" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-[#a67c52]" placeholder="請輸入外送地址">
                     </div>
                     <div>
                         <label class="block text-sm font-black text-gray-700 mb-2">付款方式</label>
@@ -69,7 +67,6 @@
                     </div>
                 </div>
 
-                <!-- 點餐區 -->
                 <div class="space-y-4">
                     <div class="flex justify-between items-end">
                         <h2 class="text-base font-black text-[#a67c52] tracking-widest border-l-4 border-[#a67c52] pl-3">選擇餐點內容</h2>
@@ -84,15 +81,7 @@
                     <div id="menu-sections" class="space-y-8"></div>
                 </div>
 
-                <!-- 結帳區 -->
                 <div class="pt-6 border-t border-gray-100 text-right">
-                    <div class="mb-6 px-4 py-4 bg-amber-50 border border-amber-100 rounded-2xl text-left">
-                        <h4 class="text-xs font-black text-amber-700 mb-2 tracking-widest">📝 訂購須知</h4>
-                        <ul class="text-[13px] text-amber-800 space-y-1 font-bold">
-                            <li>🍚 本餐點「不附白飯」，歡迎另行加點。</li>
-                            <li>🌿 嚴選特級冷壓初榨橄欖油製作。</li>
-                        </ul>
-                    </div>
                     <div id="fee-breakdown" class="text-xs font-bold text-gray-400 h-4 mb-2"></div>
                     <div class="flex justify-between items-center mb-6 bg-[#fcfaf8] p-6 rounded-2xl border border-[#a67c52]/20 shadow-inner">
                         <span class="font-black text-[#a67c52] text-base tracking-widest">訂單預估總額</span>
@@ -103,7 +92,6 @@
             </form>
         </div>
 
-        <!-- 成功畫面 -->
         <div id="success-container" class="hidden bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/20">
             <div class="bg-green-50 p-8 text-center border-b border-green-100">
                 <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-lg">✓</div>
@@ -112,15 +100,6 @@
             </div>
             <div class="p-6 space-y-6">
                 <div id="summary-content" class="bg-gray-50 rounded-2xl p-6 text-left text-sm text-gray-700 whitespace-pre-line leading-relaxed shadow-inner border border-gray-100 font-medium"></div>
-                
-                <div class="bg-[#fcfaf8] rounded-2xl p-6 border-2 border-[#a67c52]/20">
-                    <h3 class="text-[#a67c52] font-black text-lg mb-4 flex items-center">💳 轉帳資訊</h3>
-                    <div class="space-y-3 font-medium text-gray-800 text-sm">
-                        <div class="flex justify-between border-b border-gray-100 pb-2"><span>國泰世華 (013)</span> <span class="font-mono font-bold">103501069021</span></div>
-                        <div class="flex justify-between border-b border-gray-100 pb-2"><span>街口支付 (903)</span> <span class="font-mono font-bold">903550968</span></div>
-                        <div class="flex justify-between"><span>Line Bank (824)</span> <span class="font-mono font-bold">111015190734</span></div>
-                    </div>
-                </div>
                 <button onclick="location.reload()" class="w-full py-4 text-gray-400 font-black border-t mt-4">返回重新填寫</button>
             </div>
         </div>
@@ -130,12 +109,29 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwTf4gRhPlyKQiTOb0OVn66pxgGkjgodsgnVxmfjWiBSbq6nXtRoRuUkoN9A2lPaf-j/exec';
         
         const menus = {
-            Tue: { side: ["特製玉子燒", "嫩煎豆腐", "手作泡菜"], main: [{n:"蒜香雞肉",m:190,s:120},{n:"厚切豬肉",m:240,s:150}], soup: "元氣雞湯" },
-            Wed: { side: ["溏心蛋", "胡麻豆腐", "百香果青木瓜"], main: [{n:"檸檬魚片",m:240,s:150},{n:"台式油淋雞",m:190,s:120}], soup: "鮮魚味噌湯" },
-            Thu: { side: ["蔥花蛋", "紅燒豆腐", "黃金海帶絲"], main: [{n:"泰式蝦仁",m:240,s:150},{n:"香煎豬排",m:240,s:150}], soup: "清燉牛肉湯" },
-            Fri: { side: ["奶油玉米", "香烤時蔬", "醋溜川耳"], main: [{n:"秘製滷排",m:190,s:120},{n:"清蒸鱈魚",m:280,s:170}], soup: "家常排骨湯" }
+            Tue: {
+                side: [{n:"糯米椒炒豆乾",m:100,s:60},{n:"馬鈴薯炒肉絲",m:110,s:70},{n:"番茄炒蛋",m:100,s:60}],
+                main: [{n:"果香翅小腿",m:180,s:100},{n:"薑煸小卷",m:250,s:150},{n:"蔥爆豬肉片",m:180,s:100},{n:"乾煎鱸魚",m:210,s:120},{n:"乾煎鮭魚",m:290,s:170}],
+                soup: "味噌牡蠣湯"
+            },
+            Wed: {
+                side: [{n:"蔬菜烘蛋",m:100,s:60},{n:"馬鈴薯炒肉絲",m:110,s:70},{n:"蔥爆豆乾",m:100,s:60}],
+                main: [{n:"香菇肉燥",m:180,s:100},{n:"檸檬魚",m:230,s:130},{n:"蔥爆牛肉",m:240,s:140},{n:"大黃瓜燴蝦仁",m:180,s:100},{n:"乾煎鮭魚",m:290,s:170}],
+                soup: "海帶芽貢丸湯"
+            },
+            Thu: {
+                side: [{n:"蟹黃豆腐煲",m:120,s:70},{n:"蔥爆豆乾",m:100,s:60},{n:"番茄炒蛋",m:100,s:60}],
+                main: [{n:"南瓜滷肉",m:220,s:130},{n:"茄汁鯖魚",m:200,s:120},{n:"蔥爆牛肉",m:240,s:140},{n:"大黃瓜燴蝦仁",m:180,s:100},{n:"乾煎鮭魚",m:290,s:170}],
+                soup: "香菇雞湯"
+            },
+            Fri: {
+                side: [{n:"金針菇炒豆包",m:100,s:60},{n:"蔥爆豆乾",m:100,s:60},{n:"番茄炒蛋",m:100,s:60}],
+                main: [{n:"白醬嫩雞",m:200,s:120},{n:"絲瓜鮮蚵",m:190,s:110},{n:"蔥爆豬肉片",m:180,s:100},{n:"紅燒鱸魚",m:210,s:120},{n:"乾煎鮭魚",m:290,s:170}],
+                soup: "香根牛肉湯"
+            }
         };
 
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
         let allDaySelections = { Tue: {}, Wed: {}, Thu: {}, Fri: {} };
         let currentDay = 'Tue';
 
@@ -154,8 +150,7 @@
         }
 
         function resetCurrentDay() {
-            const dayName = {Tue:'週二', Wed:'週三', Thu:'週四', Fri:'週五'}[currentDay];
-            if(confirm(`確定要清除 ${dayName} 的所有選擇嗎？`)) {
+            if(confirm(`確定要清除本日的所有選擇嗎？`)) {
                 allDaySelections[currentDay] = {};
                 renderMenu();
                 updateTotal();
@@ -168,39 +163,33 @@
             const sel = allDaySelections[currentDay];
             let html = '';
 
-            // 基礎餐規格 (包含刪除/不預訂邏輯)
             html += `<div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-3">
-                <h3 class="text-sm font-black text-gray-500 tracking-widest">● 基礎餐規格</h3>
+                <h3 class="text-sm font-black text-gray-500 tracking-widest">● 基礎餐(內容：時蔬+青花菜+當日副菜)</h3>
                 <div class="grid grid-cols-2 gap-2">
-                    <label class="cursor-pointer"><input type="radio" name="baseSize" value="M" ${sel.baseSize==='M'?'checked':''} onchange="updateSel('baseSize','M')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-400 peer-checked:border-[#a67c52] peer-checked:bg-[#a67c52]/5 peer-checked:text-[#a67c52]">大份 M ($290)</div></label>
-                    <label class="cursor-pointer"><input type="radio" name="baseSize" value="S" ${sel.baseSize==='S'?'checked':''} onchange="updateSel('baseSize','S')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-400 peer-checked:border-[#a67c52] peer-checked:bg-[#a67c52]/5 peer-checked:text-[#a67c52]">小份 S ($180)</div></label>
+                    <label class="cursor-pointer"><input type="radio" name="baseSize" value="M" ${sel.baseSize==='M'?'checked':''} onchange="updateSel('baseSize','M')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-400 peer-checked:border-[#a67c52] peer-checked:bg-[#a67c52]/5 peer-checked:text-[#a67c52]">大份 M ($320)</div></label>
+                    <label class="cursor-pointer"><input type="radio" name="baseSize" value="S" ${sel.baseSize==='S'?'checked':''} onchange="updateSel('baseSize','S')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-400 peer-checked:border-[#a67c52] peer-checked:bg-[#a67c52]/5 peer-checked:text-[#a67c52]">小份 S ($200)</div></label>
                     <label class="cursor-pointer"><input type="radio" name="baseSize" value="NONE" ${sel.baseSize==='NONE'?'checked':''} onchange="updateSel('baseSize','NONE')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-400 peer-checked:border-red-400 peer-checked:bg-red-50/50 peer-checked:text-red-500">純加點 ($50)</div></label>
                     <label class="cursor-pointer"><input type="radio" name="baseSize" value="" ${!sel.baseSize?'checked':''} onchange="updateSel('baseSize','')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-300 peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-600">本日不預訂</div></label>
                 </div>
             </div>`;
 
-            // 只有選擇了規格才會出現副菜與加點
-            if (sel.baseSize && sel.baseSize !== 'NONE') {
-                html += `<div class="space-y-3"><h3 class="text-sm font-black text-gray-500 tracking-widest">● 選擇基礎餐副菜</h3>`;
-                data.side.forEach(opt => {
-                    html += `<label class="block cursor-pointer"><input type="radio" name="sideChoice" value="${opt}" ${sel.sideChoice===opt?'checked':''} onchange="updateSel('sideChoice','${opt}')" class="peer sr-only"><div class="p-4 bg-white border border-gray-100 rounded-2xl peer-checked:border-[#a67c52] font-black text-gray-700">${opt}</div></label>`;
-                });
-                html += `</div>`;
-            }
-
             if (sel.baseSize) {
-                html += `<div class="space-y-4"><h3 class="text-sm font-black text-gray-500 tracking-widest">● 加點時價清單</h3>`;
-                data.main.forEach((m, idx) => html += renderAddonItem(`main-${idx}`, `主菜：${m.n}`, m.m, m.s));
-                data.side.forEach((s, idx) => html += renderAddonItem(`side-${idx}`, `副菜：${s}`, 60, 40));
-                
+                if (sel.baseSize !== 'NONE') {
+                    html += `<div class="space-y-3"><h3 class="text-sm font-black text-gray-500 tracking-widest">● 選擇基礎餐副菜</h3>`;
+                    data.side.forEach((opt, idx) => {
+                        html += `<label class="block cursor-pointer"><input type="radio" name="sideChoice" value="${opt.n}" ${sel.sideChoice===opt.n?'checked':''} onchange="updateSel('sideChoice','${opt.n}')" class="peer sr-only"><div class="p-4 bg-white border border-gray-100 rounded-2xl peer-checked:border-[#a67c52] font-black text-gray-700 flex justify-between"><span>[${alphabet[idx]}] ${opt.n}</span><span class="text-gray-300 font-medium">基礎餐含</span></div></label>`;
+                    });
+                    html += `</div>`;
+                }
+
+                html += `<div class="space-y-4"><h3 class="text-sm font-black text-gray-500 tracking-widest">● 加點主菜副菜及湯品</h3>`;
+                let addonLetterIdx = 0;
+                data.side.forEach((s, idx) => { html += renderAddonItem(`side-${idx}`, `[${alphabet[addonLetterIdx++]}] 副菜：${s.n}`, s.m, s.s); });
+                data.main.forEach((m, idx) => { html += renderAddonItem(`main-${idx}`, `[${alphabet[addonLetterIdx++]}] 主菜：${m.n}`, m.m, m.s); });
                 const soupQty = sel['soup'] || 0;
                 html += `<div class="p-4 bg-white border rounded-2xl flex justify-between items-center shadow-sm">
-                    <div><div class="font-black text-gray-700">湯品：${data.soup}</div><div class="text-xs text-gray-400">加點價 $80</div></div>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="changeQty('soup',-1)" class="w-8 h-8 bg-gray-100 rounded-lg">－</button>
-                        <span class="w-6 text-center font-bold">${soupQty}</span>
-                        <button type="button" onclick="changeQty('soup',1)" class="w-8 h-8 bg-orange-50 text-[#a67c52] rounded-lg">＋</button>
-                    </div>
+                    <div><div class="font-black text-gray-700">[${alphabet[addonLetterIdx++]}] 湯品：${data.soup}</div><div class="text-xs text-gray-400">加點價 $100</div></div>
+                    <div class="flex gap-2"><button type="button" onclick="changeQty('soup',-1)" class="w-8 h-8 bg-gray-100 rounded-lg">－</button><span class="w-6 text-center font-bold">${soupQty}</span><button type="button" onclick="changeQty('soup',1)" class="w-8 h-8 bg-orange-50 text-[#a67c52] rounded-lg">＋</button></div>
                 </div>`;
                 html += `</div>`;
             }
@@ -226,7 +215,7 @@
         }
 
         function updateSel(key, val) { 
-            if (val === "") allDaySelections[currentDay] = {}; // 歸零邏輯
+            if (val === "") allDaySelections[currentDay] = {}; 
             else allDaySelections[currentDay][key] = val; 
             renderMenu(); 
             updateTotal(); 
@@ -244,12 +233,13 @@
             ['Tue', 'Wed', 'Thu', 'Fri'].forEach(day => {
                 const sel = allDaySelections[day]; if (!sel.baseSize) return;
                 activeDays++;
-                if (sel.baseSize === 'M') total += 290; else if (sel.baseSize === 'S') total += 180; else total += 50;
-                Object.keys(sel).forEach(k => {
-                    const q = parseInt(sel[k]) || 0;
-                    if (k.startsWith('main')) { const [_, i, sz] = k.split('-'); total += q * (sz==='M'?menus[day].main[i].m:menus[day].main[i].s); }
-                    else if (k.startsWith('side')) { total += q * (k.endsWith('-M') ? 60 : 40); }
-                    else if (k === 'soup') total += q * 80;
+                if (sel.baseSize === 'M') total += 320; else if (sel.baseSize === 'S') total += 200; else if (sel.baseSize === 'NONE') total += 50;
+                Object.keys(sel).forEach(key => {
+                    const qty = parseInt(sel[key]) || 0; if (qty <= 0) return;
+                    const menuData = menus[day];
+                    if (key.startsWith('main-')) { const p = key.split('-'); total += qty * (p[2] === 'M' ? menuData.main[p[1]].m : menuData.main[p[1]].s); }
+                    else if (key.startsWith('side-')) { const p = key.split('-'); total += qty * (p[2] === 'M' ? menuData.side[p[1]].m : menuData.side[p[1]].s); }
+                    else if (key === 'soup') total += qty * 100;
                 });
             });
             const dFee = delivery.includes('外送') ? (activeDays * 50) : 0;
@@ -259,18 +249,44 @@
 
         function generateDetailText() {
             let d = [];
+            const pickupTime = document.getElementById('pickupTime').value;
+            const deliveryType = document.getElementById('deliveryType').value;
+            const userAddress = document.getElementById('userAddress').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+
+            d.push(`【取餐資訊】`);
+            d.push(` ▫️ 取餐時段：${pickupTime}`);
+            d.push(` ▫️ 取餐方式：${deliveryType}`);
+            if (deliveryType.includes('外送')) d.push(` ▫️ 配送地址：${userAddress || '未填寫'}`);
+            d.push(` ▫️ 付款方式：${paymentMethod}`);
+            d.push(`---------------------------`);
+            d.push(``);
+
             ['Tue', 'Wed', 'Thu', 'Fri'].forEach(day => {
                 const sel = allDaySelections[day]; if (!sel.baseSize) return;
-                const name = {Tue:'週二', Wed:'週三', Thu:'週四', Fri:'週五'}[day];
-                d.push(`● ${name}`);
+                const menuData = menus[day];
+                d.push(`● ${{Tue:'週二', Wed:'週三', Thu:'週四', Fri:'週五'}[day]}`);
                 if (sel.baseSize === 'NONE') d.push(` ▫️ 純加點 (基本費 $50)`);
-                else d.push(` ▫️ 基礎餐(${sel.baseSize}): ${sel.sideChoice || '未選'}`);
-                Object.keys(sel).forEach(k => {
-                    const q = parseInt(sel[k]) || 0; if (q <= 0) return;
-                    if (k.startsWith('main')) { const [_, i, sz] = k.split('-'); d.push(` ▫️ 加點主菜: ${menus[day].main[i].n} (${sz}) x${q}`); }
-                    else if (k.startsWith('side')) { const [_, i, sz] = k.split('-'); d.push(` ▫️ 加點副菜: ${menus[day].side[i]} (${sz}) x${q}`); }
-                    else if (k === 'soup') d.push(` ▫️ 加點湯品: ${menus[day].soup} x${q}`);
+                else {
+                    const baseSide = sel.sideChoice || '未選';
+                    const sideIdx = menuData.side.findIndex(s => s.n === baseSide);
+                    d.push(` ▫️ 基礎餐(${sel.baseSize}): ${sideIdx!==-1?'['+alphabet[sideIdx]+'] ':''}${baseSide}`);
+                }
+                let lIdx = 0;
+                menuData.side.forEach((s, i) => {
+                    const qM = parseInt(sel[`side-${i}-M`]) || 0, qS = parseInt(sel[`side-${i}-S`]) || 0;
+                    if(qM > 0) d.push(` ▫️ [${alphabet[lIdx]}] 加點-${s.n} (M) x${qM}`);
+                    if(qS > 0) d.push(` ▫️ [${alphabet[lIdx]}] 加點-${s.n} (S) x${qS}`);
+                    lIdx++;
                 });
+                menuData.main.forEach((m, i) => {
+                    const qM = parseInt(sel[`main-${i}-M`]) || 0, qS = parseInt(sel[`main-${i}-S`]) || 0;
+                    if(qM > 0) d.push(` ▫️ [${alphabet[lIdx]}] 加點-${m.n} (M) x${qM}`);
+                    if(qS > 0) d.push(` ▫️ [${alphabet[lIdx]}] 加點-${m.n} (S) x${qS}`);
+                    lIdx++;
+                });
+                const sQ = parseInt(sel['soup']) || 0;
+                if(sQ > 0) d.push(` ▫️ [${alphabet[lIdx]}] 加點-湯品(${menuData.soup}) x${sQ}`);
                 d.push("");
             });
             return d.join('\n');
@@ -278,13 +294,10 @@
 
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
             const detailText = generateDetailText();
-            if(!detailText) return alert('請至少選擇一天的餐點內容！');
-            
-            btn.disabled = true;
-            btn.innerText = "傳送中...";
-
+            if(!detailText) return alert('請先選餐！');
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true; btn.innerText = "傳送中...";
             const params = new URLSearchParams();
             params.append('date', new Date().toLocaleString('zh-TW'));
             params.append('user', document.getElementById('userName').value);
@@ -295,31 +308,14 @@
             params.append('detail', detailText);
             params.append('amount', document.getElementById('display-total').innerText.replace(/,/g, ''));
             params.append('note', document.getElementById('userNote').value || "無");
-
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: params });
-                
-                const pickupType = params.get('type');
-                const addressInfo = (pickupType !== "自取") ? `\n配送地址：${params.get('address')}` : "";
-
                 document.getElementById('form-container').classList.add('hidden');
                 document.getElementById('success-container').classList.remove('hidden');
-                document.getElementById('summary-content').innerText = 
-                    `【訂購確認摘要】\n` +
-                    `聯絡人：${params.get('user')}\n` +
-                    `取餐時間：${params.get('time')}\n` +
-                    `取餐方式：${pickupType}${addressInfo}\n` +
-                    `付款方式：${params.get('payment')}\n` +
-                    `預估總額：NT$${params.get('amount')}\n\n` +
-                    `${detailText}`;
+                document.getElementById('summary-content').innerText = `【訂購摘要】\n聯絡人：${params.get('user')}\n總額：NT$${params.get('amount')}\n\n${detailText}`;
                 window.scrollTo(0, 0);
-            } catch (err) {
-                alert('發送失敗，請先「截圖」後聯繫我們！');
-                btn.disabled = false;
-                btn.innerText = "確認預訂";
-            }
+            } catch (err) { alert('發送失敗，請截圖後聯繫我們！'); btn.disabled = false; btn.innerText = "確認預訂"; }
         });
-
         switchDay('Tue');
     </script>
 </body>
