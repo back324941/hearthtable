@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搭伙晚餐 Hearth Table - 預訂系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #1a1410; background-image: radial-gradient(#2d2420 0.5px, transparent 0.5px); background-size: 20px 20px; }
+        .gold-gradient { background: linear-gradient(135deg, #d4a574 0%, #a67c52 100%); }
+        .day-tab.active { border-color: #a67c52; background-color: rgba(166, 124, 82, 0.1); color: #a67c52; }
+        .feature-badge { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px); }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4">
+
+    <div class="max-w-xl mx-auto">
+        <!-- 訂購表單區 -->
+        <div id="form-container" class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+            <div class="gold-gradient p-8 text-white text-center">
+                <h1 class="text-3xl font-bold tracking-[0.2em]">搭伙晚餐</h1>
+                <p class="mt-1 opacity-90 font-light italic tracking-widest text-lg">Hearth Table</p>
+                <div class="mt-4 inline-block px-4 py-2 feature-badge rounded-full text-xs tracking-widest font-bold border border-white/30">
+                    ✨ 嚴選特級初榨橄欖油、無味精烹調
+                </div>
+            </div>
+
+            <form id="orderForm" class="p-6 space-y-8">
+                <!-- 基本資料區 -->
+                <div class="bg-gray-50 rounded-2xl p-6 space-y-6 border border-gray-100">
+                    <h2 class="text-base font-black text-[#a67c52] tracking-widest border-l-4 border-[#a67c52] pl-3">基本聯絡資料</h2>
+                    <div>
+                        <label class="block text-sm font-black text-gray-700 mb-2">聯絡人 (社群名稱 + 帳號名稱)</label>
+                        <input type="text" id="userName" required class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-[#a67c52]" placeholder="例如：Line 曼蒂">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-black text-gray-700 mb-2">取餐時段</label>
+                            <select id="pickupTime" required class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white">
+                                <option value="17:00-18:00">17:00 - 18:00</option>
+                                <option value="17:30-18:30">17:30 - 18:30</option>
+                                <option value="18:30-19:00">18:30 - 19:00</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-black text-gray-700 mb-2">取餐方式</label>
+                            <select id="deliveryType" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white" onchange="handleDeliveryChange(this.value)">
+                                <option value="自取">自取 (免運)</option>
+                                <option value="外送(本人/家人)">外送-本人 ($50/日)</option>
+                                <option value="外送(管理員)">外送-管理員 ($50/日)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="addressSection" class="hidden">
+                        <label class="block text-sm font-black text-gray-700 mb-2">配送地址</label>
+                        <input type="text" id="userAddress" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-[#a67c52]" placeholder="請輸入外送地址 (限3公里內)">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-black text-gray-700 mb-2">付款方式</label>
+                        <select id="paymentMethod" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-white">
+                            <option value="轉帳">轉帳</option>
+                            <option value="現金">現金</option>
+                            <option value="管理員代付">管理員代付</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-black text-gray-700 mb-2">特別需求備註</label>
+                        <textarea id="userNote" rows="2" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#a67c52] outline-none text-base resize-none" placeholder="如：不蔥、不辣..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 點餐區 -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end">
+                        <h2 class="text-base font-black text-[#a67c52] tracking-widest border-l-4 border-[#a67c52] pl-3">選擇餐點內容</h2>
+                        <button type="button" onclick="resetCurrentDay()" class="text-xs font-bold text-gray-300 hover:text-red-400">↺ 清除本日重選</button>
+                    </div>
+                    <div class="flex border rounded-xl overflow-hidden bg-gray-50">
+                        <button type="button" onclick="switchDay('Tue')" id="tab-Tue" class="day-tab active flex-1 py-4 text-center font-black">週二</button>
+                        <button type="button" onclick="switchDay('Wed')" id="tab-Wed" class="day-tab flex-1 py-4 text-center font-black">週三</button>
+                        <button type="button" onclick="switchDay('Thu')" id="tab-Thu" class="day-tab flex-1 py-4 text-center font-black">週四</button>
+                        <button type="button" onclick="switchDay('Fri')" id="tab-Fri" class="day-tab flex-1 py-4 text-center font-black">週五</button>
+                    </div>
+                    <div id="menu-sections" class="space-y-8"></div>
+                </div>
+
+                <!-- 結帳區 -->
+                <div class="pt-6 border-t border-gray-100 text-right">
+                    <div class="mb-6 px-4 py-4 bg-amber-50 border border-amber-100 rounded-2xl text-left">
+                        <h4 class="text-xs font-black text-amber-700 mb-2 tracking-widest">📝 訂購須知</h4>
+                        <ul class="text-[13px] text-amber-800 space-y-1 font-bold">
+                            <li>🍚 本餐點「不附白飯」，歡迎另行加點。</li>
+                            <li>🌿 嚴選特級冷壓初榨橄欖油製作。</li>
+                        </ul>
+                    </div>
+                    <div id="fee-breakdown" class="text-xs font-bold text-gray-400 h-4 mb-2"></div>
+                    <div class="flex justify-between items-center mb-6 bg-[#fcfaf8] p-6 rounded-2xl border border-[#a67c52]/20 shadow-inner">
+                        <span class="font-black text-[#a67c52] text-base tracking-widest">訂單預估總額</span>
+                        <span class="text-4xl font-black text-[#a67c52]">NT$<span id="display-total">0</span></span>
+                    </div>
+                    <button type="submit" id="submitBtn" class="gold-gradient w-full py-6 rounded-2xl text-white font-black text-xl shadow-xl tracking-[0.2em]">確認預訂</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 成功畫面 -->
+        <div id="success-container" class="hidden bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+            <div class="bg-green-50 p-8 text-center border-b border-green-100">
+                <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-lg">✓</div>
+                <h2 class="text-2xl font-black text-gray-800 tracking-wider">訂單已成功送達！</h2>
+                <p class="text-red-600 font-black mt-2 text-lg">📢 請務必「截圖」回傳至 Line</p>
+            </div>
+            <div class="p-6 space-y-6">
+                <div id="summary-content" class="bg-gray-50 rounded-2xl p-6 text-left text-sm text-gray-700 whitespace-pre-line leading-relaxed shadow-inner border border-gray-100 font-medium"></div>
+                
+                <div class="bg-[#fcfaf8] rounded-2xl p-6 border-2 border-[#a67c52]/20">
+                    <h3 class="text-[#a67c52] font-black text-lg mb-4 flex items-center">💳 轉帳資訊</h3>
+                    <div class="space-y-3 font-medium text-gray-800 text-sm">
+                        <div class="flex justify-between border-b border-gray-100 pb-2"><span>國泰世華 (013)</span> <span class="font-mono font-bold">103501069021</span></div>
+                        <div class="flex justify-between border-b border-gray-100 pb-2"><span>街口支付 (903)</span> <span class="font-mono font-bold">903550968</span></div>
+                        <div class="flex justify-between"><span>Line Bank (824)</span> <span class="font-mono font-bold">111015190734</span></div>
+                    </div>
+                </div>
+                <button onclick="location.reload()" class="w-full py-4 text-gray-400 font-black border-t mt-4">返回重新填寫</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwTf4gRhPlyKQiTOb0OVn66pxgGkjgodsgnVxmfjWiBSbq6nXtRoRuUkoN9A2lPaf-j/exec';
+        
+        const menus = {
+            Tue: { side: ["特製玉子燒", "嫩煎豆腐", "手作泡菜"], main: [{n:"蒜香雞肉",m:190,s:120},{n:"厚切豬肉",m:240,s:150}], soup: "元氣雞湯" },
+            Wed: { side: ["溏心蛋", "胡麻豆腐", "百香果青木瓜"], main: [{n:"檸檬魚片",m:240,s:150},{n:"台式油淋雞",m:190,s:120}], soup: "鮮魚味噌湯" },
+            Thu: { side: ["蔥花蛋", "紅燒豆腐", "黃金海帶絲"], main: [{n:"泰式蝦仁",m:240,s:150},{n:"香煎豬排",m:240,s:150}], soup: "清燉牛肉湯" },
+            Fri: { side: ["奶油玉米", "香烤時蔬", "醋溜川耳"], main: [{n:"秘製滷排",m:190,s:120},{n:"清蒸鱈魚",m:280,s:170}], soup: "家常排骨湯" }
+        };
+
+        let allDaySelections = { Tue: {}, Wed: {}, Thu: {}, Fri: {} };
+        let currentDay = 'Tue';
+
+        function handleDeliveryChange(val) {
+            const section = document.getElementById('addressSection');
+            if(val.includes('外送')) section.classList.remove('hidden');
+            else { section.classList.add('hidden'); document.getElementById('userAddress').value = ''; }
+            updateTotal();
+        }
+
+        function switchDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${day}`).classList.add('active');
+            renderMenu();
+        }
+
+        function resetCurrentDay() {
+            const dayName = {Tue:'週二', Wed:'週三', Thu:'週四', Fri:'週五'}[currentDay];
+            if(confirm(`確定要清除 ${dayName} 的所有選擇嗎？`)) {
+                allDaySelections[currentDay] = {};
+                renderMenu();
+                updateTotal();
+            }
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menu-sections');
+            const data = menus[currentDay];
+            const sel = allDaySelections[currentDay];
+            let html = '';
+
+            // 基礎餐規格 (包含刪除/不預訂邏輯)
+            html += `<div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-3">
+                <h3 class="text-sm font-black text-gray-500 tracking-widest">● 基礎餐規格</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="cursor-pointer"><input type="radio" name="baseSize" value="M" ${sel.baseSize==='M'?'checked':''} onchange="updateSel('baseSize','M')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-400 peer-checked:border-[#a67c52] peer-checked:bg-[#a67c52]/5 peer-checked:text-[#a67c52]">大份 M ($290)</div></label>
+                    <label class="cursor-pointer"><input type="radio" name="baseSize" value="S" ${sel.baseSize==='S'?'checked':''} onchange="updateSel('baseSize','S')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-400 peer-checked:border-[#a67c52] peer-checked:bg-[#a67c52]/5 peer-checked:text-[#a67c52]">小份 S ($180)</div></label>
+                    <label class="cursor-pointer"><input type="radio" name="baseSize" value="NONE" ${sel.baseSize==='NONE'?'checked':''} onchange="updateSel('baseSize','NONE')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-400 peer-checked:border-red-400 peer-checked:bg-red-50/50 peer-checked:text-red-500">純加點 ($50)</div></label>
+                    <label class="cursor-pointer"><input type="radio" name="baseSize" value="" ${!sel.baseSize?'checked':''} onchange="updateSel('baseSize','')" class="peer sr-only"><div class="py-3 text-center border-2 rounded-xl font-black text-gray-300 peer-checked:border-gray-400 peer-checked:bg-gray-100 peer-checked:text-gray-600">本日不預訂</div></label>
+                </div>
+            </div>`;
+
+            // 只有選擇了規格才會出現副菜與加點
+            if (sel.baseSize && sel.baseSize !== 'NONE') {
+                html += `<div class="space-y-3"><h3 class="text-sm font-black text-gray-500 tracking-widest">● 選擇基礎餐副菜</h3>`;
+                data.side.forEach(opt => {
+                    html += `<label class="block cursor-pointer"><input type="radio" name="sideChoice" value="${opt}" ${sel.sideChoice===opt?'checked':''} onchange="updateSel('sideChoice','${opt}')" class="peer sr-only"><div class="p-4 bg-white border border-gray-100 rounded-2xl peer-checked:border-[#a67c52] font-black text-gray-700">${opt}</div></label>`;
+                });
+                html += `</div>`;
+            }
+
+            if (sel.baseSize) {
+                html += `<div class="space-y-4"><h3 class="text-sm font-black text-gray-500 tracking-widest">● 加點時價清單</h3>`;
+                data.main.forEach((m, idx) => html += renderAddonItem(`main-${idx}`, `主菜：${m.n}`, m.m, m.s));
+                data.side.forEach((s, idx) => html += renderAddonItem(`side-${idx}`, `副菜：${s}`, 60, 40));
+                
+                const soupQty = sel['soup'] || 0;
+                html += `<div class="p-4 bg-white border rounded-2xl flex justify-between items-center shadow-sm">
+                    <div><div class="font-black text-gray-700">湯品：${data.soup}</div><div class="text-xs text-gray-400">加點價 $80</div></div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="changeQty('soup',-1)" class="w-8 h-8 bg-gray-100 rounded-lg">－</button>
+                        <span class="w-6 text-center font-bold">${soupQty}</span>
+                        <button type="button" onclick="changeQty('soup',1)" class="w-8 h-8 bg-orange-50 text-[#a67c52] rounded-lg">＋</button>
+                    </div>
+                </div>`;
+                html += `</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderAddonItem(id, name, pM, pS) {
+            const valM = allDaySelections[currentDay][id+'-M'] || 0;
+            const valS = allDaySelections[currentDay][id+'-S'] || 0;
+            return `<div class="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col gap-3">
+                <div class="font-black text-gray-700">${name}</div>
+                <div class="flex gap-4">
+                    <div class="flex-1 flex justify-between items-center bg-gray-50 p-2 rounded-xl border">
+                        <span class="text-xs font-black text-gray-400">M ($${pM})</span>
+                        <div class="flex items-center"><button type="button" onclick="changeQty('${id}-M',-1)" class="w-6 h-6 text-gray-300">－</button><span class="w-6 text-center font-bold text-sm">${valM}</span><button type="button" onclick="changeQty('${id}-M',1)" class="w-6 h-6 text-[#a67c52]">＋</button></div>
+                    </div>
+                    <div class="flex-1 flex justify-between items-center bg-gray-50 p-2 rounded-xl border">
+                        <span class="text-xs font-black text-gray-400">S ($${pS})</span>
+                        <div class="flex items-center"><button type="button" onclick="changeQty('${id}-S',-1)" class="w-6 h-6 text-gray-300">－</button><span class="w-6 text-center font-bold text-sm">${valS}</span><button type="button" onclick="changeQty('${id}-S',1)" class="w-6 h-6 text-[#a67c52]">＋</button></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function updateSel(key, val) { 
+            if (val === "") allDaySelections[currentDay] = {}; // 歸零邏輯
+            else allDaySelections[currentDay][key] = val; 
+            renderMenu(); 
+            updateTotal(); 
+        }
+
+        function changeQty(id, amt) { 
+            allDaySelections[currentDay][id] = Math.max(0, (allDaySelections[currentDay][id] || 0) + amt); 
+            renderMenu(); 
+            updateTotal(); 
+        }
+
+        function updateTotal() {
+            let total = 0; let activeDays = 0;
+            const delivery = document.getElementById('deliveryType').value;
+            ['Tue', 'Wed', 'Thu', 'Fri'].forEach(day => {
+                const sel = allDaySelections[day]; if (!sel.baseSize) return;
+                activeDays++;
+                if (sel.baseSize === 'M') total += 290; else if (sel.baseSize === 'S') total += 180; else total += 50;
+                Object.keys(sel).forEach(k => {
+                    const q = parseInt(sel[k]) || 0;
+                    if (k.startsWith('main')) { const [_, i, sz] = k.split('-'); total += q * (sz==='M'?menus[day].main[i].m:menus[day].main[i].s); }
+                    else if (k.startsWith('side')) { total += q * (k.endsWith('-M') ? 60 : 40); }
+                    else if (k === 'soup') total += q * 80;
+                });
+            });
+            const dFee = delivery.includes('外送') ? (activeDays * 50) : 0;
+            document.getElementById('display-total').innerText = (total + dFee).toLocaleString();
+            document.getElementById('fee-breakdown').innerText = dFee > 0 ? `(含外送費 $${dFee}，共 ${activeDays} 天)` : "";
+        }
+
+        function generateDetailText() {
+            let d = [];
+            ['Tue', 'Wed', 'Thu', 'Fri'].forEach(day => {
+                const sel = allDaySelections[day]; if (!sel.baseSize) return;
+                const name = {Tue:'週二', Wed:'週三', Thu:'週四', Fri:'週五'}[day];
+                d.push(`● ${name}`);
+                if (sel.baseSize === 'NONE') d.push(` ▫️ 純加點 (基本費 $50)`);
+                else d.push(` ▫️ 基礎餐(${sel.baseSize}): ${sel.sideChoice || '未選'}`);
+                Object.keys(sel).forEach(k => {
+                    const q = parseInt(sel[k]) || 0; if (q <= 0) return;
+                    if (k.startsWith('main')) { const [_, i, sz] = k.split('-'); d.push(` ▫️ 加點主菜: ${menus[day].main[i].n} (${sz}) x${q}`); }
+                    else if (k.startsWith('side')) { const [_, i, sz] = k.split('-'); d.push(` ▫️ 加點副菜: ${menus[day].side[i]} (${sz}) x${q}`); }
+                    else if (k === 'soup') d.push(` ▫️ 加點湯品: ${menus[day].soup} x${q}`);
+                });
+                d.push("");
+            });
+            return d.join('\n');
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const detailText = generateDetailText();
+            if(!detailText) return alert('請至少選擇一天的餐點內容！');
+            
+            btn.disabled = true;
+            btn.innerText = "傳送中...";
+
+            const params = new URLSearchParams();
+            params.append('date', new Date().toLocaleString('zh-TW'));
+            params.append('user', document.getElementById('userName').value);
+            params.append('time', document.getElementById('pickupTime').value);
+            params.append('type', document.getElementById('deliveryType').value);
+            params.append('address', document.getElementById('userAddress').value || "自取");
+            params.append('payment', document.getElementById('paymentMethod').value);
+            params.append('detail', detailText);
+            params.append('amount', document.getElementById('display-total').innerText.replace(/,/g, ''));
+            params.append('note', document.getElementById('userNote').value || "無");
+
+            try {
+                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: params });
+                
+                const pickupType = params.get('type');
+                const addressInfo = (pickupType !== "自取") ? `\n配送地址：${params.get('address')}` : "";
+
+                document.getElementById('form-container').classList.add('hidden');
+                document.getElementById('success-container').classList.remove('hidden');
+                document.getElementById('summary-content').innerText = 
+                    `【訂購確認摘要】\n` +
+                    `聯絡人：${params.get('user')}\n` +
+                    `取餐時間：${params.get('time')}\n` +
+                    `取餐方式：${pickupType}${addressInfo}\n` +
+                    `付款方式：${params.get('payment')}\n` +
+                    `預估總額：NT$${params.get('amount')}\n\n` +
+                    `${detailText}`;
+                window.scrollTo(0, 0);
+            } catch (err) {
+                alert('發送失敗，請先「截圖」後聯繫我們！');
+                btn.disabled = false;
+                btn.innerText = "確認預訂";
+            }
+        });
+
+        switchDay('Tue');
+    </script>
+</body>
+</html>
