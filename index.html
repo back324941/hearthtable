@@ -72,7 +72,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <select id="deliveryType" class="px-2 py-5 rounded-2xl border-4 border-gray-100 font-black text-xl text-center" onchange="toggleDelivery(this.value)">
                             <option value="自取">店內自取</option>
-                            <option value="外送">外送(+$50/日)(3公里內)</option>
+                            <option value="外送">外送 (3km內)</option>
                         </select>
                         <select id="pickupTime" class="px-2 py-5 rounded-2xl border-4 border-gray-100 font-black text-xl text-center">
                             <option value="17:00-18:00">17:00-18:00</option>
@@ -105,7 +105,7 @@
 
                 <div class="pt-8 space-y-6">
                     <div onclick="goToNextDay()" id="nextDayBtn" class="w-full py-6 bg-gray-800 text-white rounded-[2rem] text-center font-black text-2xl clickable shadow-lg">下一個日期 ➜</div>
-                    <div onclick="submitOrder()" class="gold-gradient w-full py-8 rounded-[2.5rem] text-center text-white font-black text-3xl shadow-xl clickable">確認預訂，產出截圖 ➔</div>
+                    <div onclick="submitOrder()" class="gold-gradient w-full py-8 rounded-[2.5rem] text-center text-white font-black text-3xl shadow-xl clickable">確認預訂，送出並截圖 ➔</div>
                 </div>
             </div>
         </div>
@@ -113,11 +113,11 @@
         <div id="success-container" class="hidden bg-white rounded-[3rem] shadow-2xl p-8 text-center border-[8px] border-orange-100">
             <div class="mb-6">
                 <h2 class="text-4xl font-black text-gray-800 italic">Hearth Table</h2>
-                <p class="text-gray-400 font-bold">訂單明細確認</p>
+                <p class="text-gray-400 font-bold">訂單明細已同步至後台</p>
             </div>
             <div id="summary-content" class="text-left text-xl font-black whitespace-pre-line leading-relaxed border-4 p-8 rounded-[2rem] bg-gray-50 mb-8 border-gray-100"></div>
             <p class="text-red-500 font-black mb-4">📸 請截圖此畫面並回傳 Line 群組</p>
-            <div onclick="location.reload()" class="text-gray-300 underline text-lg py-4">返回修改</div>
+            <div onclick="location.reload()" class="text-gray-300 underline text-lg py-4">返回修改內容</div>
         </div>
     </div>
 
@@ -133,7 +133,7 @@
         let currentDay = 'Tue';
         let paymentMethod = '現金';
 
-        // 核心邏輯：判斷某一天是否有有效的加點品項
+        // 功能性：判斷是否有點任何單點菜
         function hasAddons(day) {
             const s = selections[day];
             return Object.keys(s).some(k => k.includes('addon') && s[k] > 0);
@@ -154,8 +154,8 @@
             document.getElementById('pay-LinePay').className = `py-4 border-4 rounded-2xl text-center font-black text-lg clickable ${method==='LinePay'?'item-selected':'border-gray-100 text-gray-300'}`;
         }
 
-        function clearDay() { if(confirm(`重設週${{Tue:'二',Wed:'三',Thu:'四',Fri:'五'}[currentDay]}？`)) { selections[currentDay] = {}; renderMenu(); updateTotal(); }}
-        function clearAll() { if(confirm("全部清空？")) { selections = { Tue: {}, Wed: {}, Thu: {}, Fri: {} }; toggleCart(false); renderMenu(); updateTotal(); }}
+        function clearDay() { if(confirm(`重設週${{Tue:'二',Wed:'三',Thu:'四',Fri:'五'}[currentDay]}的選單？`)) { selections[currentDay] = {}; renderMenu(); updateTotal(); }}
+        function clearAll() { if(confirm("確定全部清空？")) { selections = { Tue: {}, Wed: {}, Thu: {}, Fri: {} }; toggleCart(false); renderMenu(); updateTotal(); }}
 
         function switchDay(day) { 
             currentDay = day; 
@@ -177,20 +177,36 @@
         function renderMenu() {
             const sel = selections[currentDay];
             const data = menus[currentDay];
-            let html = `<div class="grid grid-cols-2 gap-4">
-                <div onclick="updateSel('type','M')" class="p-6 border-4 rounded-[2rem] font-black text-center text-2xl clickable ${sel.type==='M'?'item-selected':'border-gray-100 text-gray-300'}">M 套餐 $500</div>
-                <div onclick="updateSel('type','S')" class="p-6 border-4 rounded-[2rem] font-black text-center text-2xl clickable ${sel.type==='S'?'item-selected':'border-gray-100 text-gray-300'}">S 套餐 $300</div>
-            </div>
-            <div onclick="updateSel('type','NONE')" class="py-2 text-center font-black text-lg ${sel.type==='NONE'?'text-[#a67c52]':'text-gray-300'} underline clickable">➔ 自由單點模式</div>`;
+            let html = `
+            <div class="space-y-4">
+                <div class="bg-orange-50 border-l-4 border-[#a67c52] p-4 rounded-r-xl space-y-2">
+                    <div class="text-[#a67c52] font-black text-lg">🍱 套餐內容：一主菜 + 一時蔬 + 青花菜 + 一副菜</div>
+                    <div class="flex gap-4 text-sm font-bold text-gray-500">
+                        <span class="bg-white px-2 py-1 rounded border border-orange-200 shadow-sm text-orange-600">M：主菜和副菜各300g+時蔬和青花菜各200g</span>
+                        <span class="bg-white px-2 py-1 rounded border border-orange-200 shadow-sm">S：M套餐份量的一半</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div onclick="updateSel('type','M')" class="p-6 border-4 rounded-[2.5rem] font-black text-center clickable ${sel.type==='M'?'item-selected':'border-gray-100 text-gray-300'}">
+                        <div class="text-2xl">M 套餐</div>
+                        <div class="text-lg opacity-80">$500</div>
+                    </div>
+                    <div onclick="updateSel('type','S')" class="p-6 border-4 rounded-[2.5rem] font-black text-center clickable ${sel.type==='S'?'item-selected':'border-gray-100 text-gray-300'}">
+                        <div class="text-2xl">S 套餐</div>
+                        <div class="text-lg opacity-80">$300</div>
+                    </div>
+                </div>
+                <div onclick="updateSel('type','NONE')" class="py-2 text-center font-black text-lg ${sel.type==='NONE'?'text-[#a67c52]':'text-gray-300'} underline clickable">➔ 自由單點模式</div>
+            </div>`;
 
             if (sel.type === 'M' || sel.type === 'S') {
                 const limit = (sel.type === 'M') ? 180 : 100;
-                html += `<div class="space-y-4 pt-6 border-t-4 border-gray-50"><h3 class="text-xl font-black text-[#a67c52]">STEP 2. 套餐主菜</h3>`;
+                html += `<div class="space-y-4 pt-6 border-t-4 border-gray-50"><h3 class="text-xl font-black text-[#a67c52]">STEP 2. 選擇套餐主菜</h3>`;
                 data.main.forEach((m, i) => {
                     const extra = Math.max(0, (sel.type==='M'?m.m:m.s) - limit);
                     html += `<div onclick="updateSel('mainIdx',${i})" class="p-6 border-4 rounded-2xl font-black text-2xl flex justify-between items-center clickable ${sel.mainIdx===i?'item-selected':'border-gray-50 bg-gray-50/50'}"><span>${m.i}. ${m.n}</span> ${extra>0?`<span class="text-red-500 text-lg">+$${extra}</span>`:''}</div>`;
                 });
-                html += `</div><div class="space-y-4 pt-6"><h3 class="text-xl font-black text-[#a67c52]">STEP 3. 套餐副菜</h3>`;
+                html += `</div><div class="space-y-4 pt-6"><h3 class="text-xl font-black text-[#a67c52]">STEP 3. 選擇套餐副菜</h3>`;
                 data.side.forEach((s, i) => {
                     html += `<div onclick="updateSel('sideIdx',${i})" class="p-6 border-4 rounded-2xl font-black text-2xl clickable ${sel.sideIdx===i?'item-selected':'border-gray-50 bg-gray-50/50'}">${s.i}. ${s.n}</div>`;
                 });
@@ -198,7 +214,7 @@
             }
 
             if(sel.type) {
-                html += `<div class="pt-10 border-t-4 border-gray-100 space-y-8"><h3 class="text-2xl font-black text-[#a67c52] italic uppercase">加購/單點品項</h3>`;
+                html += `<div class="pt-10 border-t-4 border-gray-100 space-y-8"><h3 class="text-2xl font-black text-[#a67c52] italic uppercase">加點/單購品項</h3>`;
                 data.main.forEach((m, i) => html += renderAddon(`addonM-${i}`, m.i, m.n, m.m, m.s));
                 data.side.forEach((s, i) => html += renderAddon(`addonS-${i}`, s.i, s.n, s.m, s.s));
                 const sQty = sel['addonSoup'] || 0;
@@ -244,9 +260,7 @@
             const delivery = document.getElementById('deliveryType').value;
             for (let day in selections) {
                 const s = selections[day]; if (!s.type) continue;
-                
-                // 防誤觸：如果是單點模式但完全沒選菜，則不計費也不計天數
-                if (s.type === 'NONE' && !hasAddons(day)) continue;
+                if (s.type === 'NONE' && !hasAddons(day)) continue; 
 
                 activeDays++;
                 let dayTotal = 0;
@@ -271,14 +285,14 @@
             let list = [];
             for (let day in selections) {
                 const s = selections[day]; if (!s.type) continue;
-                if (s.type === 'NONE' && !hasAddons(day)) continue; // 抽屜預覽也排除空單點
+                if (s.type === 'NONE' && !hasAddons(day)) continue;
 
                 const dName = {Tue:'週二',Wed:'週三',Thu:'週四',Fri:'週五'}[day];
                 let items = [];
                 if(s.type === 'NONE') items.push(`<li class="text-red-500 italic">⚠️ 自由單點</li>`);
                 else {
                     items.push(`<li>🍱 ${s.type}套餐：${menus[day].main[s.mainIdx||0].n}</li>`);
-                    items.push(`<li>🥗 副菜：${s.sideIdx==='v'?'時蔬量加倍':menus[day].side[s.sideIdx||0].n}</li>`);
+                    items.push(`<li>🥗 副菜：${s.sideIdx==='v'?'時蔬加量':menus[day].side[s.sideIdx||0].n}</li>`);
                 }
                 Object.keys(s).forEach(k => { if (s[k]>0 && k.includes('addon')) {
                     const p = k.split('-');
@@ -291,48 +305,71 @@
                     <ul class="text-xl font-bold text-gray-700 space-y-2">${items.join('')}</ul>
                 </div>`);
             }
-            document.getElementById('cart-items-list').innerHTML = list.join('') || '<div class="text-center py-20 text-gray-300 font-black">無選購內容</div>';
+            document.getElementById('cart-items-list').innerHTML = list.join('') || '<div class="text-center py-20 text-gray-300 font-black">尚未選餐</div>';
         }
 
+        // 核心傳送功能
         function submitOrder() {
             const name = document.getElementById('userName').value;
             const delType = document.getElementById('deliveryType').value;
             const address = document.getElementById('address').value;
-            if(!name) { alert("請填寫姓名"); return; }
+            
+            if(!name) { alert("請填寫訂購人姓名"); return; }
             if(delType === '外送' && !address) { alert("請填寫外送地址"); return; }
 
-            let d = [`【Hearth Table 預訂清單】`,`訂購人：${name}`,`配送：${delType}`,`時間：${document.getElementById('pickupTime').value}`];
+            let d = [`【Hearth Table 預訂清單】`,`訂購人：${name}`,`方式：${delType}`,`時間：${document.getElementById('pickupTime').value}`];
             if(delType === '外送') d.push(`地址：${address}`);
             d.push(`付款：${paymentMethod}`,`---------------------------`);
             
             let hasValidData = false;
             for (let day in selections) {
                 const s = selections[day]; if (!s.type) continue;
-                if (s.type === 'NONE' && !hasAddons(day)) continue; // 結帳排除空單點
+                if (s.type === 'NONE' && !hasAddons(day)) continue; // 單點模式無菜自動排除
 
                 hasValidData = true;
                 d.push(`● ${{Tue:'週二',Wed:'週三',Thu:'週四',Fri:'週五'}[day]}：`);
                 if(s.type === 'NONE') d.push(`  ▫️ 模式：自由單點 ($50服務費)`);
                 else d.push(`  ▫️ 套餐：${s.type}套餐 (${menus[day].main[s.mainIdx||0].n})`);
-                Object.keys(s).forEach(k => { if (s[k]>0 && k.includes('addon')) {
-                    const p = k.split('-');
-                    if (k.startsWith('addonM-')) d.push(`  ➕ [單點] ${menus[day].main[p[1]].n}(${p[2]}) x${s[k]}`);
-                    if (k.startsWith('addonS-')) d.push(`  ➕ [單點] ${menus[day].side[p[1]].n}(${p[2]}) x${s[k]}`);
-                    if (k === 'addonSoup') d.push(`  ➕ [加購] ${menus[day].soup.n} x${s[k]}`);
-                }});
+                
+                Object.keys(s).forEach(k => { 
+                    if (s[k]>0 && k.includes('addon')) {
+                        const p = k.split('-');
+                        if (k.startsWith('addonM-')) d.push(`  ➕ [單點] ${menus[day].main[p[1]].n}(${p[2]}) x${s[k]}`);
+                        if (k.startsWith('addonS-')) d.push(`  ➕ [單點] ${menus[day].side[p[1]].n}(${p[2]}) x${s[k]}`);
+                        if (k === 'addonSoup') d.push(`  ➕ [加購] ${menus[day].soup.n} x${s[k]}`);
+                    }
+                });
             }
 
-            if(!hasValidData) { alert("請先選購餐點再提交！"); return; }
+            if(!hasValidData) { alert("請先選餐！"); return; }
+            const totalAmount = document.getElementById('cart-total').innerText;
+            d.push(`---------------------------`,`應付總計：NT$ ${totalAmount}`);
 
-            d.push(`---------------------------`,`應付總計：NT$ ${document.getElementById('cart-total').innerText}`);
-            
-            // 隱藏圓形按鈕
+            // 執行資料傳送
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbwdnHKWC5dx4tvtH_ZN6Tk9S1t5deIt1rioHZCg8ltCKr9mr3Dnn24jeixheUVUHfRa/exec";
+            fetch(webAppUrl, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: name,
+                    delivery: delType,
+                    address: address || "自取",
+                    time: document.getElementById('pickupTime').value,
+                    payment: paymentMethod,
+                    orderDetail: d.join('\n'),
+                    total: totalAmount
+                })
+            });
+
+            // 介面轉換
             document.getElementById('side-total-btn').style.display = 'none';
             document.getElementById('form-container').classList.add('hidden');
             document.getElementById('success-container').classList.remove('hidden');
             document.getElementById('summary-content').innerText = d.join('\n');
             window.scrollTo(0, 0);
         }
+
         switchDay('Tue');
     </script>
 </body>
